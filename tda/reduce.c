@@ -13,6 +13,8 @@ int asignarVector(Vector *vec, int ce, unsigned tamElemento);
 int inicializarVector(Vector *vec, void *valor);
 int insertarEnPosicion(Vector *vec, int pos, void *valor);
 void eliminarVector(Vector *vec);
+int reduce(Vector *vec, int (*filtro)(void *elemento));
+int filtro(void *dato);
 
 int main(){
     Vector vec1;
@@ -32,7 +34,7 @@ int main(){
         printf("%d\t", *(int*)(vec1.ptr + vec1.tamElemento * i));
     }
     printf("\n");
-    
+    printf("%d\n", reduce(&vec1, filtro));
     eliminarVector(&vec1);
     return 0;
 }
@@ -81,4 +83,25 @@ void eliminarVector(Vector *vec){
     vec->ce = 0;
     vec->tamElemento = 0;
     return;
+}
+
+
+int reduce(Vector *vec, int (*filtro)(void *elemento)){
+    int acum = 0;
+    for (int i = 0; i < vec->ce; i++){
+        if(filtro(vec->ptr + vec->tamElemento * i)){
+            printf("%d\t", *(int*)(vec->ptr + vec->tamElemento * i));
+            acum += *(int*)(vec->ptr + vec->tamElemento * i);
+        }
+    }
+    return acum;
+}
+
+int filtro(void *dato){
+    int *numero = (int*) dato;
+    if((*numero % 2) == 0){
+        return 1;
+    } else{
+        return 0;
+    }
 }
