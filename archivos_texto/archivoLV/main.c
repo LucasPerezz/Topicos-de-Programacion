@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct{
     int dia;
@@ -17,13 +18,26 @@ typedef struct{
 
 void lotePrueba();
 int abrirArchivo(FILE **arch, char *nombreArchivo, char *modo);
+void trozado(tEmpleado *emp, char *s);
 
 
 int main(){
-    lotePrueba();
+    // lotePrueba();
+    char cadena[100];
+    tEmpleado emp;
+    FILE *arch;
+    if(!abrirArchivo(&arch, "lote1.txt", "rt")){
+        return 0;
+    }
+    while(fgets(cadena, sizeof(cadena), arch)){
+        trozado(&emp, cadena);
+        printf("%ld;%s;%c;%d;%d;%d;%f\n", emp.dni, emp.apyn, emp.categoria, emp.fecIngreso.dia, emp.fecIngreso.mes, emp.fecIngreso.anio, emp.sueldo);
+    }
 
+    fclose(arch);
     return 0;
 }
+
 
 void lotePrueba(){
     FILE *arch;
@@ -53,4 +67,37 @@ int abrirArchivo(FILE **arch, char *nombreArchivo, char *modo){
     }
     printf("Se abrio correctamente el siguiente archivo: %s\n", nombreArchivo);
     return 1;
+}
+
+void trozado(tEmpleado *emp, char *s){
+    char *aux;
+    aux = strrchr(s, '\n');
+    *aux = '\0';
+
+    aux = strrchr(s, ';');
+    sscanf(aux + 1, "%f", &emp->sueldo);
+    *aux = '\0';
+
+    aux = strrchr(s, ';');
+    sscanf(aux + 1, "%d", &emp->fecIngreso.anio);
+    *aux = '\0';
+
+    aux = strrchr(s, ';');
+    sscanf(aux + 1, "%d", &emp->fecIngreso.mes);
+    *aux = '\0';
+
+    aux = strrchr(s, ';');
+    sscanf(aux + 1, "%d", &emp->fecIngreso.dia);
+    *aux = '\0';
+
+    aux = strrchr(s, ';');
+    sscanf(aux + 1, "%c", &emp->categoria);
+    *aux = '\0';
+
+    aux = strrchr(s, ';');
+    strcpy(emp->apyn, aux + 1);
+    *aux = '\0';
+
+    sscanf(s, "%ld", &emp->dni);
+    return;
 }
